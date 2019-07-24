@@ -6,9 +6,11 @@ import router from './router'
 import 'amfe-flexible'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-
+import VueLazyload from 'vue-lazyload'
 Vue.use(VueAxios, axios)
-
+Vue.use(VueLazyload, {
+  loading: require('common/image/default.png')
+})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

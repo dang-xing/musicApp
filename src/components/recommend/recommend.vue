@@ -1,18 +1,19 @@
 <template>
-    <div>
+    <div class="home">
+      <scroll ref="scroll" class="recommend-content" :data="musciData">
       <div class="musci-wrap">
         <banner></banner>
-        <scroll ref="scroll" class="recommend-content" :data="musciData">
+
         <div class="hot-music">
           <h1>热门歌单推荐</h1>
           <div class="music-list" v-for="(item,index) in musciData">
-              <img :src="item.picUrl" alt="" width="60px">
+              <img v-lazy="item.picUrl" alt="" width="60px">
               <p>{{item.name}}</p>
               <span>{{item.copywriter}}</span>
           </div>
         </div>
-        </scroll>
       </div>
+      </scroll>
     </div>
 </template>
 
@@ -72,10 +73,10 @@
   color: hsla(0,0%,100%,.3);
   font-size: 12px;
 }
-.musci-wrap{
+.home{
   position: fixed;
   width: 100%;
-  top: 88px;
+  top: 95px;
   bottom: 0;
 }
 .recommend-content{
