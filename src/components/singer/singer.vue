@@ -5,7 +5,7 @@
         <div class="title">热门歌手</div>
         <div class="singer-list">
           <ul>
-            <li v-for="(item,index) in singerData">
+            <li v-for="(item,index) in singerData" @click="selectSinger(index)">
               <img v-lazy="item.picUrl" alt="">
               <span>{{item.name}}</span>
             </li>
@@ -13,11 +13,13 @@
         </div>
       </div>
       </scroll>
+      <router-view></router-view>
     </div>
 </template>
 
 <script>
   import Scroll from 'base/scroll/scroll'
+  import {mapMutations} from 'vuex'
     export default {
         name: "singer",
         data(){
@@ -36,7 +38,15 @@
                 this.singerData=res.data.artists;
               }
             })
-          }
+          },
+          selectSinger:function(index){
+              this.$router.push(`/singer/${this.singerData[index].id}`)
+              var singer=this.singerData[index];
+              this.setSinger(singer);
+          },
+          ...mapMutations({
+            setSinger:'SET_SINGER'
+          })
         },
       components:{
         Scroll,

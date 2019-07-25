@@ -7,6 +7,7 @@ import 'amfe-flexible'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueLazyload from 'vue-lazyload'
+import store from './store'
 Vue.use(VueAxios, axios)
 Vue.use(VueLazyload, {
   loading: require('common/image/default.png')
@@ -15,6 +16,7 @@ Vue.use(VueLazyload, {
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
