@@ -7,6 +7,7 @@ import 'amfe-flexible'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueLazyload from 'vue-lazyload'
+import 'font-awesome/css/font-awesome.css'
 import store from './store'
 Vue.use(VueAxios, axios)
 Vue.use(VueLazyload, {

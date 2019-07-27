@@ -68,13 +68,5 @@
   .slide-enter, .slide-leave-to{
     transform: translate3d(100%, 0, 0)
   }
-.singer-detail{
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9;
-  background-color: #333;
-}
+
 </style>

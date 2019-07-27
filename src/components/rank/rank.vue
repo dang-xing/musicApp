@@ -76,5 +76,6 @@
   line-height: 25px;
   box-sizing: border-box;
   padding-left: 10px;
+  overflow: hidden;
 }
 </style>
