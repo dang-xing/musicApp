@@ -1,7 +1,7 @@
 <template>
   <div class="music-list" ref="musiclist">
     <div class="music-top" :style="bgStyle" ref="musictop">
-      <i class="fa fa-angle-left"></i>
+      <i class="fa fa-angle-left" @click="goBack()"></i>
       <h2>{{title}}</h2>
       <div class="filter"></div>
       <button class="play-btn" ref="btn">随机播放</button>
@@ -45,6 +45,9 @@
         methods:{
           getCenter:function(){
             this.$refs.btn.style.left=`${(this.$refs.musiclist.clientWidth-this.$refs.btn.clientWidth)/2}px`
+          },
+          goBack:function () {
+            this.$router.push('/singer');
           }
         },
         components:{

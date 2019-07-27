@@ -40,7 +40,6 @@
             }
             this.axios.get(`http://music.cyxlove.cn/artists?id=${this.singer.id}`).then((res)=>{
               this.song=this._normallist(res.data.hotSongs);
-              console.log(this.song);
             })
           },
           _normallist:function (list) {
