@@ -1,4 +1,9 @@
 const state={
-  singer:{}
+  singer:{},
+  playing:false,
+  playList:[],
+  squeenList:[],
+  fullScreen:false,
+  currentIndex:-1,
 }
 export default  state

@@ -7,7 +7,7 @@
       <button class="play-btn" ref="btn">随机播放</button>
     </div>
     <scroll :data="song" class="list" ref="list">
-      <div><song-list :song="song"></song-list></div>
+      <div><song-list :song="song" @select="selectitem"></song-list></div>
     </scroll>
 
   </div>
@@ -17,6 +17,7 @@
 <script>
     import Scroll from 'base/scroll/scroll'
     import SongList from '@/components/song-list/song-list'
+    import {mapActions} from 'vuex'
     export default {
         name: "music-list",
         props:{
@@ -48,7 +49,16 @@
           },
           goBack:function () {
             this.$router.push('/singer');
-          }
+          },
+          selectitem:function (item,index) {
+            this.setPlayer({
+              list:item,
+              index:index,
+            })
+          },
+            ...mapActions({
+              setPlayer:'selectPlay'
+            })
         },
         components:{
           Scroll,

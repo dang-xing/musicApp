@@ -44,7 +44,6 @@
           },
           _normallist:function (list) {
             let ret=[];
-
             list.forEach((item)=>{
               let hotSongs=item;
 
