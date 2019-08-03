@@ -18,7 +18,5 @@ const mutations={
   [types.SET_CURRENTINDEX](state,index){
     state.currentIndex=index
   }
-
-
  }
 export default mutations;
