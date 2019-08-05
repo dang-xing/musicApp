@@ -8,9 +8,14 @@
             <h2>{{getcurrentSong.name}}</h2>
             <p>{{getcurrentSong.singer}}</p>
           </div>
-          <div class="player-img">
-            <img :src="getcurrentSong.img" alt="" :class="adClass">
+          <div class="player-img" style="display: none">
+            <img :src="getcurrentSong.img" alt="" :class="adClass" >
           </div>
+          <scroll class="lyice-top" :data="lyiceData.lines" ref="lyricList">
+          <div class="player-img lyice">
+              <p v-for="(item,index) in lyiceData.lines" v-bind:class="{activelyice: currentNum===index}" ref="lyiceline">{{item.txt}}</p>
+          </div>
+          </scroll>
           <div class="play-time" >
              <div class="start-time" ref="startbox">{{time(currentTime)}}</div>
               <div class="pro-wrap">
@@ -25,7 +30,7 @@
               <div class="end-time" >{{time(endTime)}}</div>
           </div>
           <div class="player-menu">
-            <i class="fa fa-random"></i>
+            <i :class="playmodel" @click="playModel"></i>
             <i class="fa fa-fast-backward" @click="prevMusic"></i>
             <i class="play-btn" @click="playMusic" :class="playicon"></i>
             <i class="fa fa-fast-forward" @click="nexPlay"></i>
@@ -33,12 +38,13 @@
           </div>
       </div>
       <div class="mini-player" v-show="!fullScreen"></div>
-      <audio :src="getcurrentSong.url" ref="audio" loop="loop" @timeupdate="updatetime" @suspend="endtime"></audio>
+      <audio :src="getcurrentSong.url" ref="audio" @timeupdate="updatetime" @suspend="endtime" @ended="endPlay" ></audio>
     </div>
 </template>
 
 <script>
   import {mapGetters,mapMutations} from 'vuex'
+  import Scroll from 'base/scroll/scroll'
   import Lyric from 'lyric-parser'
     export default {
         name: "player",
@@ -46,6 +52,8 @@
           return{
             currentTime:'0',
             endTime:'0',
+            lyiceData:[],
+            currentNum:0,
           }
         },
         computed:{
@@ -54,8 +62,18 @@
             'playList',
             'currentSong',
             'playing',
-            'currentIndex'
+            'currentIndex',
+            'loop',
+            'order',
           ]),
+          playmodel(){
+            if(this.loop){
+              return 'fa fa-refresh'
+            }
+            if(this.order){
+              return 'fa fa-retweet'
+            }
+          },
           adClass(){
             return this.playing ? 'play':'play pause';
           },
@@ -89,6 +107,9 @@
             setplaying:'SET_PLAYING',
             setIndex:'SET_CURRENTINDEX',
           }),
+          playModel:function(){
+
+          },
           prostart:function(e){
             this.touch.init=true;
             this.touch.moveX=e.touches[0].pageX
@@ -97,12 +118,27 @@
           //获取歌词
           getLyc:function(){
             if(this.currentSong !=undefined){
-              const id=this.currentSong.id;
+              var id=this.currentSong.id;
             }
             this.axios.get(`http://music.cyxlove.cn/lyric?id=${id}`).then((res)=>{
-              console.log(res.data.lrc.lyric);
+                if(res.data.lrc.lyric !=''){
+                  this.lyiceData=new Lyric(res.data.lrc.lyric,this.handleLyric);
+                  if(this.playing){
+                    this.lyiceData.play();
+                  }
+                }
 
             })
+          },
+          handleLyric:function({lineNum,txt}){
+              this.currentNum=lineNum;
+            if (lineNum > 5) {
+              let lineEl = this.$refs.lyiceline[lineNum - 7]
+              this.$refs.lyricList.scrollToElement(lineEl, 1000)
+            }
+            if(lineNum<1){
+              this.$refs.lyricList.scrollTo(0,0,1000);
+            }
           },
           promove:function(e){
             if(!this.touch.init){
@@ -114,10 +150,15 @@
             this.$refs.probtn.style.left=`${offsetWidth}px`
             const barWidth=this.$refs.progressbar.clientWidth-15;
             const lace=this.$refs.probg.clientWidth / barWidth
+            const currentTime=lace*this.endTime;
             this.$refs.audio.currentTime=lace*this.endTime;
             if(!this.playing){
               this.playMusic();
             }
+            if(this.lyiceData){
+              this.lyiceData.seek(currentTime*1000);
+            }
+
           },
           proend:function(){
             this.touch.init=false;
@@ -129,7 +170,11 @@
             this.$refs.probtn.style.left=`${offsetWidth }px`
             const barWidth=this.$refs.progressbar.clientWidth-15;
             const lace=this.$refs.probg.clientWidth / barWidth
-            this.$refs.audio.currentTime=lace*this.endTime;
+            const currentTime=lace*this.endTime;
+            this.$refs.audio.currentTime=currentTime;
+            if(this.lyiceData){
+              this.lyiceData.seek(currentTime*1000);
+            }
             if(!this.playing){
               this.playMusic();
             }
@@ -158,10 +203,22 @@
             }
           },
           updatetime:function (e) {
-           this.currentTime=e.target.currentTime;
+            this.currentTime=e.target.currentTime;
           },
           endtime:function(e){
             this.endTime=e.target.duration;
+
+          },
+          endPlay:function(){
+            if(this.loop){
+              this.$refs.audio.loop='loop';
+              return
+            }
+            if(this.order){
+              this.$refs.audio.loop=false;
+              this.nexPlay();
+            }
+
           },
           time:function (value) {
             let m=parseInt(value/60)
@@ -177,15 +234,29 @@
         },
         watch:{
           currentSong(){
-            setTimeout(()=>{
+            clearTimeout(this.timer)
+            this.timer=setTimeout(()=>{
               this.$refs.audio.play()
+              this.getLyc();
             },200)
+
           },
           playing(newPlaying){
             let audio=this.$refs.audio;
             this.$nextTick(()=>{
               newPlaying ? audio.play() : audio.pause();
+              setTimeout(()=>{
+                if(newPlaying){
+                  if(this.lyiceData){
+                    this.lyiceData.seek(this.currentTime*1000);
+                  }
+                }else{
+                  this.lyiceData.stop();
+                }
+              },1000)
+
             })
+
           },
           percent(){
             if(this.percent>=0){
@@ -196,6 +267,9 @@
             }
             //console.log(this.percent);
           }
+        },
+        components:{
+          Scroll,
         }
     }
 </script>
@@ -363,5 +437,27 @@
   left: 0;
   top: 0;
   z-index: 8;
+}
+.lyice-top{
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 80px !important;
+  text-align: center !important;
+}
+.lyice{
+  overflow: hidden;
+  border-radius: unset;
+}
+.lyice p{
+  color: #ccc;
+  font-size: 14px;
+  height: 30px;
+  line-height: 30px;
+}
+.activelyice{
+  color: #fff !important;
 }
 </style>

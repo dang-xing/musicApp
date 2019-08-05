@@ -17,6 +17,13 @@ const mutations={
   },
   [types.SET_CURRENTINDEX](state,index){
     state.currentIndex=index
+  },
+  [types.SET_LOOP](state,flag){
+    state.loop=flag;
+  },
+  [types.SET_ORDER](state,flag){
+    state.order=flag;
   }
+
  }
 export default mutations;
