@@ -234,8 +234,8 @@
         },
         watch:{
           currentSong(){
-            clearTimeout(this.timer)
-            this.timer=setTimeout(()=>{
+            clearTimeout(timer)
+            const  timer=setTimeout(()=>{
               this.$refs.audio.play()
               this.getLyc();
             },200)

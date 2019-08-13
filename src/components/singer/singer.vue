@@ -25,6 +25,7 @@
         data(){
           return{
             singerData:[],
+
           }
         },
         created() {
